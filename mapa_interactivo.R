@@ -3,22 +3,25 @@
 # devtools::install_github("sjmgarnier/viridis")
 Sys.setenv("plotly_username" = "boriscout")
 Sys.setenv("plotly_api_key" = "6dhvua95f6")
-
+library(scales)
 library(plotly)
-library(ddply)
+library(Cairo)
 #signup("id","mail",save=TRUE)
 
-
-
+View(wmap)
+ec<-readOGR("ECU_adm1.shp","ECU_adm1")
+plot(ec)
 # p <- plot_ly(economics, x = date, y = uempmed)
 # p
-wmap<-readShapeLines("DEMOGRAFICO/prov_pop01.shp")
-#wmap <- readOGR(dsn="DEMOGRAFICO/prov_pop01.shp", layer="prov_pop01")
-names(wmap)
-# convert to dataframe
-wmap_df <- fortify(wmap)
-
-View(wmap_df)
+#Leemos el archivo shp
+wmap<-readOGR(dsn="ECU_adm1.shp",layer="ECU_adm1")
+View(wmap)
+# convert to dataframe... así obtenemos el mapa con las coordenadas
+  wmap<-wmap[wmap$ID_1!="9",]
+wmap_df <- fortify(wmap,region="NAMES_1")
+names(wmap_df)
+#El ID es el nombre de la provincia
+plot(wmap)
 theme_opts <- list(theme(panel.grid.minor = element_blank(),
                          panel.grid.major = element_blank(),
                          panel.background = element_blank(),
@@ -32,19 +35,15 @@ theme_opts <- list(theme(panel.grid.minor = element_blank(),
                          axis.title.y = element_blank(),
                          plot.title = element_text(size=20)))
 
+names(wmap_df)
+names(wmap)
 
 mapa_Ecuador<-ggplot(wmap_df, aes(long,lat, group=group)) + 
-  geom_polygon(col="black",lwd=0,aes(fill="azul1")) + 
+  geom_polygon(col="blue",fill="yellow") + 
   labs(title="Ecuador") + 
   coord_equal() + 
-  theme_opts
-
-
-mapa_Ecuador
-
-geom_text(data=wmap_df, aes(long, lat, label = id), size=2)
-View(wmap)
-wmap
+  theme_opts+
+  geom_text(data=wmap, aes(long, lat, label ="NAME_1" ), size=2)
 
 mapa_Ecuador
 View(wmap)
@@ -77,3 +76,4 @@ class(ia)
 library(maps)
 View(us.cities)
 class(wmap)
+table(mama$PROVINCIA)
